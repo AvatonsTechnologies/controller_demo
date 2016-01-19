@@ -1,0 +1,11 @@
+set(DEMO_SOURCES
+    ${DEMO_SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/device.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    PARENT_SCOPE
+    )
+set(DEMO_HEADERS
+    ${DEMO_HEADERS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/device.h
+    PARENT_SCOPE
+    )
