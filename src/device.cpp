@@ -47,15 +47,52 @@ void init_device_array(device_t* device) {
     if (device->num_devices < 1) {
         printf("No devices found.");
         exit(0);
-    } else if (device->num_devices != 2 && device->num_devices != 8) {
-        printf("Non-square number of devices connected.");
+    } else if (device->num_devices != 2 && device->num_devices != 4 &&
+            device->num_devices != 8) {
+        printf("%i devices connected; not a power of two", device->num_devices);
         exit(0);
     }
 
     int i;
-    for (i = 0; i < device->num_devices; i++) {
-        device->devices[i] = device->device_list->devices[i];
-        device->frames[i] = Tactonic_CreateFrame(device->devices[i]);
+    if (device->num_devices < 8) {
+        for (i = 0; i < device->num_devices; i++) {
+            device->devices[i] = device->device_list->devices[i];
+            device->frames[i] = Tactonic_CreateFrame(device->devices[i]);
+        }
+    } else {
+        for (i = 0; i < device->num_devices; i++) {
+            // Sadly, this HAS to be hardcoded short of developing a complete
+            // configuration app
+            switch (device->device_list->devices[i].serialNumber) {
+            case 18284640:
+                device->devices[0] = device->device_list->devices[i];
+                break;
+            case 18284896:
+                device->devices[1] = device->device_list->devices[i];
+                break;
+            case 18285408:
+                device->devices[2] = device->device_list->devices[i];
+                break;
+            case 18285152:
+                device->devices[3] = device->device_list->devices[i];
+                break;
+            case 18285664:
+                device->devices[4] = device->device_list->devices[i];
+                break;
+            case 18285920:
+                device->devices[5] = device->device_list->devices[i];
+                break;
+            case 18286176:
+                device->devices[6] = device->device_list->devices[i];
+                break;
+            case 18286432:
+                device->devices[7] = device->device_list->devices[i];
+                break;
+            }
+        }
+        for (i = 0; i < device->num_devices; i++) {
+            device->frames[i] = Tactonic_CreateFrame(device->devices[i]);
+        }
     }
 
     device->composite_device = device->devices[0];
@@ -66,6 +103,15 @@ void init_device_array(device_t* device) {
         //  |_2_|
         //
         device->composite_device.rows *= 2;
+    } else if (device->num_devices == 4) {
+        // Layout looks like:
+        //   ___
+        //  |_1_|
+        //  |_2_|
+        //  |_3_|
+        //  |_4_|
+        //
+        device->composite_device.rows *= 4;
     } else if (device->num_devices == 8) {
         // Layout looks like:
         //   ___ ___
@@ -80,6 +126,8 @@ void init_device_array(device_t* device) {
     for (i = 1; i < device->num_devices; i++) {
         device->composite_device.serialNumber += device->devices[i].serialNumber;
     }
+    device->rows = device->composite_device.rows;
+    device->cols = device->composite_device.cols;
 
     device->composite_frame = Tactonic_CreateFrame(device->composite_device);
 
@@ -97,10 +145,33 @@ char poll_frame(device_t* device) {
 
         if (device->frames[i]->time > old_time) {
             int num_forces = device->frames[i]->numForces;
-            int offset = num_forces * (device->num_devices - 1 - i);
-            memcpy(&device->composite_frame->forces[offset],
-                   device->frames[i]->forces,
-                   sizeof (int) * num_forces);
+            if (device->num_devices < 8) {
+                int offset = num_forces * (device->num_devices - 1 - i);
+                memcpy(&device->composite_frame->forces[offset],
+                       device->frames[i]->forces,
+                       sizeof (int) * num_forces);
+            } else {
+                // The logic here is pretty crazy-looking, but makes sense if
+                // you study the diagrams above
+                int j;
+                int rows = device->frames[i]->rows;
+                int cols = device->frames[i]->cols;
+                if (i < 4) {
+                    for (j = 0; j < rows; j++) {
+                        int offset = (2 * i) * num_forces + 2 * j * cols;
+                        memcpy(&device->composite_frame->forces[offset],
+                               &device->frames[i]->forces[j * cols],
+                               sizeof (int) * cols);
+                    }
+                } else {
+                    for (j = 0; j < rows; j++) {
+                        int offset = (2 * (i - 4)) * num_forces + (2 * j + 1) * cols;
+                        memcpy(&device->composite_frame->forces[offset],
+                               &device->frames[i]->forces[j * cols],
+                               sizeof (int) * cols);
+                    }
+                }
+            }
             device->update[i] = 1;
         }
     }
