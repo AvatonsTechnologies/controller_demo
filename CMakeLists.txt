@@ -8,7 +8,7 @@ add_subdirectory(src)
 
 # Set output files
 
-add_executable(demo ${DEMO_SOURCES} ${DEMO_SOURCES})
+add_executable(demo ${DEMO_SOURCES} ${DEMO_HEADERS})
 add_executable(visualizer ${VISUALIZER_SOURCES} ${VISUALIZER_HEADERS})
 
 # Find and include external libraries
