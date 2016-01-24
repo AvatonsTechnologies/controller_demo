@@ -47,19 +47,8 @@ int main() {
             get_current_frame(device, &frame);
             for (i = 0; i < frame.rows; i++) {
                 for (j = 0; j < frame.cols; j++) {
-                    int f = frame.forces[i * frame.cols + j];
-                    if (j > DEVICE_WIDTH) {
-                        // We've got to invert the right-hand devices
-                        // TODO: Consider doing this in device.cpp, though it
-                        // will lower performance there to benefit code
-                        // elsewhere
-                        if (f > 0) {
-                            img[DEVICE_HEIGHT - 1 - i / row_factor][j / col_factor] += 1;
-                        }
-                    } else {
-                        if (f > 0) {
-                            img[i / row_factor][DEVICE_WIDTH - 1 - (j - DEVICE_WIDTH) / col_factor] += 1;
-                        }
+                    if (frame.forces[i * frame.cols + j] > 0) {
+                        img[i / row_factor][j / col_factor] += 1;
                     }
                 }
             }

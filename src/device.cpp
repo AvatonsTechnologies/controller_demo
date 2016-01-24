@@ -76,16 +76,16 @@ void init_device_array(device_t* device) {
             case 18285152:
                 device->devices[3] = device->device_list->devices[i];
                 break;
-            case 18285664:
+            case 18286432:
                 device->devices[4] = device->device_list->devices[i];
                 break;
-            case 18285920:
+            case 18286176:
                 device->devices[5] = device->device_list->devices[i];
                 break;
-            case 18286176:
+            case 18285920:
                 device->devices[6] = device->device_list->devices[i];
                 break;
-            case 18286432:
+            case 18285664:
                 device->devices[7] = device->device_list->devices[i];
                 break;
             }
@@ -151,23 +151,28 @@ char poll_frame(device_t* device) {
                        device->frames[i]->forces,
                        sizeof (int) * num_forces);
             } else {
-                // The logic here is pretty crazy-looking, but makes sense if
-                // you study the diagrams above
+                // To make sense of the offsets, study the diagrams above.
+                // It's important to know that forces are stored row-major,
+                // and the rows are wider than the columns.
                 int j;
                 int rows = device->frames[i]->rows;
                 int cols = device->frames[i]->cols;
                 if (i < 4) {
+                    // For the left side, we flip the rows horizontally
                     for (j = 0; j < rows; j++) {
+                        int k;
                         int offset = (2 * i) * num_forces + 2 * j * cols;
-                        memcpy(&device->composite_frame->forces[offset],
-                               &device->frames[i]->forces[j * cols],
-                               sizeof (int) * cols);
+                        for (k = 0; k < cols; k++) {
+                            device->composite_frame->forces[offset + (cols - 1 - k)] =
+                                device->frames[i]->forces[j * cols + k];
+                        }
                     }
                 } else {
+                    // For the right side, we flip the columns vertically
                     for (j = 0; j < rows; j++) {
                         int offset = (2 * (i - 4)) * num_forces + (2 * j + 1) * cols;
                         memcpy(&device->composite_frame->forces[offset],
-                               &device->frames[i]->forces[j * cols],
+                               &device->frames[i]->forces[(rows - 1 - j) * cols],
                                sizeof (int) * cols);
                     }
                 }
