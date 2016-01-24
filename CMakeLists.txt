@@ -22,3 +22,23 @@ if (Tactonic_FOUND)
     include_directories(visualizer ${Tactonic_INCLUDE_DIRS})
     target_link_libraries(visualizer ${Tactonic_LIBRARIES})
 endif ()
+
+# Configure CxxTest
+
+set(CXXTEST_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cxxtest/test.cpp)
+
+add_executable(all_tests ${TEST_SOURCES} ${TEST_HEADERS} ${CXXTEST_OUTPUT})
+
+find_package(CXXTEST REQUIRED)
+if (CXXTEST_FOUND)
+    include_directories(all_tests ${CXXTEST_INCLUDE_DIRS})
+endif ()
+
+add_custom_command(
+    OUTPUT ${CXXTEST_OUTPUT}
+    COMMAND ${CXXTEST_PYTHON_TESTGEN_EXECUTABLE} --error-printer -o ${CXXTEST_OUTPUT} ${TEST_DEFS}
+    DEPENDS ${TEST_DEFS}
+    )
+
+enable_testing()
+add_test(all_tests all_tests)

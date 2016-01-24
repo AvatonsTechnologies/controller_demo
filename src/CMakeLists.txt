@@ -1,12 +1,16 @@
+add_subdirectory(test)
+
 set(DEMO_HEADERS
     ${DEMO_HEADERS}
     ${CMAKE_CURRENT_SOURCE_DIR}/device.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/signals.h
     PARENT_SCOPE
     )
 set(DEMO_SOURCES
     ${DEMO_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/signals.cpp
     PARENT_SCOPE
     )
 
@@ -21,3 +25,17 @@ set(VISUALIZER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/visualizer.cpp
     PARENT_SCOPE
     )
+
+set(TEST_DEFS
+    ${TEST_DEFS}
+    PARENT_SCOPE
+    )
+set(TEST_HEADERS
+    ${TEST_HEADERS}
+    ${TEST_DEFS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/signals.h
+    PARENT_SCOPE)
+set(TEST_SOURCES
+    ${TEST_HEADERS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/signals.cpp
+    PARENT_SCOPE)
