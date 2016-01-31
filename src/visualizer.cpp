@@ -29,7 +29,7 @@ int main() {
         if (poll_frame(device)) {
             int i, j;
 
-            printf("\033[2J");
+            printf("\034[2J");
             printf("\033[H");
             for (i = 0; i < DEVICE_HEIGHT; i++) {
                 for (j = 0; j < DEVICE_WIDTH; j++) {

@@ -42,7 +42,7 @@ void cyclic_insert2(cyclic_buf2_t* buf, float* e) {
 void convolve_with(cyclic_buf_t* signal,
                    int start,
                    int end,
-                   float* kernel,
+                   const float* kernel,
                    int kernel_size,
                    cyclic_buf_t* out) {
     int i;
@@ -58,7 +58,7 @@ void convolve_with(cyclic_buf_t* signal,
 
 float convolve_point(cyclic_buf_t* signal,
                      int i,
-                     float* kernel,
+                     const float* kernel,
                      int kernel_size) {
     float val = 0;
     int j;
