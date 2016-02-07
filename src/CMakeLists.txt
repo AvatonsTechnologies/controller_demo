@@ -5,6 +5,7 @@ set(DEMO_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/signals.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/stick.h
     PARENT_SCOPE
     )
 set(DEMO_SOURCES
@@ -13,6 +14,7 @@ set(DEMO_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/signals.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/stick.cpp
     PARENT_SCOPE
     )
 

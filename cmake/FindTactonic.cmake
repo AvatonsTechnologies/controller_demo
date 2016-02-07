@@ -5,17 +5,17 @@
 
 find_path(Tactonic_INCLUDE_DIR
     Tactonic.h
-    HINTS "$ENV{Tactonic_DIR}/include"
+    HINTS "$ENV{HOME}/tactonic/include"
     )
 
 find_library(Tactonic_LIBRARY
     tactonic
-    HINTS "$ENV{Tactonic_DIR}"
+    HINTS "$ENV{HOME}/tactonic/lib"
     )
 
 find_library(TactonicTouch_LIBRARY
     tactonicTouch
-    HINTS "$ENV{Tactonic_DIR}"
+    HINTS "$ENV{HOME}/tactonic/lib"
     )
 
 set(Tactonic_LIBRARIES "${Tactonic_LIBRARY}" "${TactonicTouch_LIBRARY}")

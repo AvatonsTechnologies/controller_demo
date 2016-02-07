@@ -23,12 +23,19 @@ if (Tactonic_FOUND)
     target_link_libraries(visualizer ${Tactonic_LIBRARIES})
 endif ()
 
+find_package(vjoy REQUIRED)
+if (vjoy_FOUND)
+    include_directories(demo ${vjoy_INCLUDE_DIRS})
+    target_link_libraries(demo ${vjoy_LIBRARIES})
+endif ()
+
 # Configure CxxTest
 
 set(CXXTEST_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cxxtest/test.cpp)
 
 add_executable(all_tests ${TEST_SOURCES} ${TEST_HEADERS} ${CXXTEST_OUTPUT})
 
+set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR}/cxxtest)
 find_package(CXXTEST REQUIRED)
 if (CXXTEST_FOUND)
     include_directories(all_tests ${CXXTEST_INCLUDE_DIRS})

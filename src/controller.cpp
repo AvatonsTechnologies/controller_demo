@@ -26,7 +26,7 @@ const float FREQ_LEVELS[5] = {
 };
 
 const int FREQUENCY_FRAMES[5] = {
-    24, 20, 18, 16, 15
+    20, 18, 16, 14, 13
 };
 
 const float TRANSITION_KERNEL[4] = {
@@ -37,7 +37,7 @@ const float TRANSITION_KERNEL[4] = {
 const float MIN_DIR_LEN_SQ = 1.0e-4f;
 
 const int DIR_FRAMES[5] = {
-    24, 20, 18, 16, 15
+    16, 14, 12, 10, 9
 };
 
 struct controller_info_s {
@@ -168,10 +168,8 @@ void new_coordinates(controller_info_t* controller,
         }
     }
 
-    int dont_move = 0;
     float dir_len_sq = avg_dir[0] * avg_dir[0] + avg_dir[1] * avg_dir[1];
     if (dir_len_sq < MIN_DIR_LEN_SQ || total_force < MIN_FORCE) {
-        dont_move = 1;
         avg_dir[0] = 0.0f;
         avg_dir[1] = 0.0f;
     } else {
@@ -222,7 +220,7 @@ void new_coordinates(controller_info_t* controller,
     // Update counters
 
     float* prev_dir = cyclic_index2(&controller->sig_final_dir, 1);
-    if (prev_dir[0] * avg_dir[0] + prev_dir[1] * avg_dir[1] < 0.1f || dont_move) {
+    if (prev_dir[0] * avg_dir[0] + prev_dir[1] * avg_dir[1] < 0.1f) {
         controller->dir_frames_to_average = 1;
     }
 
@@ -305,15 +303,13 @@ void new_coordinates(controller_info_t* controller,
     // Set radius
 
     float final_radius = 0.0f;
-    if (!dont_move) {
-        float transition_level = convolve_point(&controller->sig_frequency, 0,
-            TRANSITION_KERNEL, 4);
-        if (transition_level > 0.25f) {
-            final_radius = 1.0f;
-        } else {
-            // This constant too
-            final_radius = 4.0f * transition_level;
-        }
+    float transition_level = convolve_point(&controller->sig_frequency, 0,
+        TRANSITION_KERNEL, 4);
+    if (transition_level > 0.25f) {
+        final_radius = 1.0f;
+    } else {
+        // This constant too
+        final_radius = 4.0f * transition_level;
     }
     cyclic_insert(&controller->sig_radius, final_radius);
 
