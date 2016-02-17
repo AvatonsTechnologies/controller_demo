@@ -18,7 +18,7 @@ const float DIFF_KERNEL[4] = {
     0.7f, -0.5f, -0.1f, -0.1f
 };
 
-const float STEP_HYSTERESIS_HIGH = 30000;
+const float STEP_HYSTERESIS_HIGH = 25000;
 const float STEP_HYSTERESIS_LOW = 10000;
 
 const float FREQ_LEVELS[5] = {
@@ -26,7 +26,7 @@ const float FREQ_LEVELS[5] = {
 };
 
 const int FREQUENCY_FRAMES[5] = {
-    20, 18, 16, 14, 13
+    7, 18, 16, 14, 13
 };
 
 const float TRANSITION_KERNEL[4] = {
@@ -37,7 +37,7 @@ const float TRANSITION_KERNEL[4] = {
 const float MIN_DIR_LEN_SQ = 1.0e-4f;
 
 const int DIR_FRAMES[5] = {
-    16, 14, 12, 10, 9
+    5, 14, 12, 10, 9
 };
 
 struct controller_info_s {
@@ -220,65 +220,34 @@ void new_coordinates(controller_info_t* controller,
     // Update counters
 
     float* prev_dir = cyclic_index2(&controller->sig_final_dir, 1);
-    if (prev_dir[0] * avg_dir[0] + prev_dir[1] * avg_dir[1] < 0.1f) {
+    if (prev_dir[0] * avg_dir[0] + prev_dir[1] * avg_dir[1] < -0.25f) {
+        controller->frequency_frames = 1;
         controller->dir_frames_to_average = 1;
     }
 
+    int level;
+
     if (cyclic_index(&controller->sig_frequency, 0) < FREQ_LEVELS[0]) {
-        if (controller->frequency_frames < FREQUENCY_FRAMES[0]) {
-            controller->frequency_frames++;
-        } else if (controller->frequency_frames > FREQUENCY_FRAMES[0]) {
-            controller->frequency_frames--;
-        }
-        if (controller->dir_frames_to_average < DIR_FRAMES[0]) {
-            controller->dir_frames_to_average++;
-        } else if (controller->dir_frames_to_average > DIR_FRAMES[0]) {
-            controller->dir_frames_to_average--;
-        }
+        level = 0;
     } else if (cyclic_index(&controller->sig_frequency, 0) < FREQ_LEVELS[1]) {
-        if (controller->frequency_frames < FREQUENCY_FRAMES[1]) {
-            controller->frequency_frames++;
-        } else if (controller->frequency_frames > FREQUENCY_FRAMES[1]) {
-            controller->frequency_frames--;
-        }
-        if (controller->dir_frames_to_average < DIR_FRAMES[1]) {
-            controller->dir_frames_to_average++;
-        } else if (controller->dir_frames_to_average > DIR_FRAMES[1]) {
-            controller->dir_frames_to_average--;
-        }
+        level = 1;
     } else if (cyclic_index(&controller->sig_frequency, 0) < FREQ_LEVELS[2]) {
-        if (controller->frequency_frames < FREQUENCY_FRAMES[2]) {
-            controller->frequency_frames++;
-        } else if (controller->frequency_frames > FREQUENCY_FRAMES[2]) {
-            controller->frequency_frames--;
-        }
-        if (controller->dir_frames_to_average < DIR_FRAMES[2]) {
-            controller->dir_frames_to_average++;
-        } else if (controller->dir_frames_to_average > DIR_FRAMES[2]) {
-            controller->dir_frames_to_average--;
-        }
+        level = 2;
     } else if (cyclic_index(&controller->sig_frequency, 0) < FREQ_LEVELS[3]) {
-        if (controller->frequency_frames < FREQUENCY_FRAMES[3]) {
-            controller->frequency_frames++;
-        } else if (controller->frequency_frames > FREQUENCY_FRAMES[3]) {
-            controller->frequency_frames--;
-        }
-        if (controller->dir_frames_to_average < DIR_FRAMES[3]) {
-            controller->dir_frames_to_average++;
-        } else if (controller->dir_frames_to_average > DIR_FRAMES[3]) {
-            controller->dir_frames_to_average--;
-        }
+        level = 3;
     } else {
-        if (controller->frequency_frames < FREQUENCY_FRAMES[4]) {
-            controller->frequency_frames++;
-        } else if (controller->frequency_frames > FREQUENCY_FRAMES[4]) {
-            controller->frequency_frames--;
-        }
-        if (controller->dir_frames_to_average < DIR_FRAMES[4]) {
-            controller->dir_frames_to_average++;
-        } else if (controller->dir_frames_to_average > DIR_FRAMES[4]) {
-            controller->dir_frames_to_average--;
-        }
+        level = 4;
+    }
+
+    if (controller->frequency_frames < FREQUENCY_FRAMES[level]) {
+        controller->frequency_frames++;
+    } else if (controller->frequency_frames > FREQUENCY_FRAMES[level]) {
+        controller->frequency_frames--;
+    }
+    if (controller->dir_frames_to_average < DIR_FRAMES[level]) {
+        controller->dir_frames_to_average++;
+    } else if (controller->dir_frames_to_average > DIR_FRAMES[level]) {
+        controller->dir_frames_to_average--;
     }
 
     // Update frequency
