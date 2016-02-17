@@ -29,6 +29,12 @@ if (vjoy_FOUND)
     target_link_libraries(demo ${vjoy_LIBRARIES})
 endif ()
 
+find_package(Oculus REQUIRED)
+if (Oculus_FOUND)
+    include_directories(demo ${Oculus_INCLUDE_DIRS})
+    target_link_libraries(demo ${Oculus_LIBRARIES})
+endif ()
+
 # Configure CxxTest
 
 set(CXXTEST_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cxxtest/test.cpp)
