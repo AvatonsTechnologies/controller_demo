@@ -48,13 +48,13 @@ void init_device_array(device_t* device) {
         printf("No devices found.");
         exit(0);
     } else if (device->num_devices != 2 && device->num_devices != 4 &&
-            device->num_devices != 8) {
+            device->num_devices != 7) {
         printf("%i devices connected; not a power of two", device->num_devices);
         exit(0);
     }
 
     int i;
-    if (device->num_devices < 8) {
+    if (device->num_devices < 7) {
         for (i = 0; i < device->num_devices; i++) {
             device->devices[i] = device->device_list->devices[i];
             device->frames[i] = Tactonic_CreateFrame(device->devices[i]);
@@ -85,9 +85,10 @@ void init_device_array(device_t* device) {
             case 18285920:
                 device->devices[6] = device->device_list->devices[i];
                 break;
-            case 18285664:
-                device->devices[7] = device->device_list->devices[i];
-                break;
+            // Well, we broke this...
+//            case 18285664:
+//               device->devices[7] = device->device_list->devices[i];
+//               break;
             }
         }
         for (i = 0; i < device->num_devices; i++) {
@@ -112,7 +113,7 @@ void init_device_array(device_t* device) {
         //  |_4_|
         //
         device->composite_device.rows *= 4;
-    } else if (device->num_devices == 8) {
+    } else if (device->num_devices == 7) {
         // Layout looks like:
         //   ___ ___
         //  |_1_|_5_|
@@ -145,7 +146,7 @@ char poll_frame(device_t* device) {
 
         if (device->frames[i]->time > old_time) {
             int num_forces = device->frames[i]->numForces;
-            if (device->num_devices < 8) {
+            if (device->num_devices < 7) {
                 int offset = num_forces * (device->num_devices - 1 - i);
                 memcpy(&device->composite_frame->forces[offset],
                        device->frames[i]->forces,
