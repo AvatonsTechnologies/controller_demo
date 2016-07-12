@@ -2,6 +2,15 @@ cmake_minimum_required(VERSION 2.8)
 project(controller_demo)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# Thanks to Oculus and Tactonics, it is only possible to build 32-bit and with
+# Visual Studio (I think). Windows only, obviously.
+if (NOT "${CMAKE_GENERATOR}" MATCHES
+        "^Visual Studio [1-9][1-9] 20[1-9][1-9]$")
+    message(FATAL_ERROR "Can only compile with Visual Studio in 32-bit mode.")
+else ()
+    string(REGEX MATCH "20[1-9][1-9]" VISUAL_STUDIO_YEAR "${CMAKE_GENERATOR}")
+endif ()
+
 # Include project files
 
 add_subdirectory(src)

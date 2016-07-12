@@ -1,4 +1,7 @@
 build/
+vjoy/
+tactonic/
+OculusSDK/
 *.o
 *.a
 *.exe

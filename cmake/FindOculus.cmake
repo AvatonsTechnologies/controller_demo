@@ -1,11 +1,19 @@
 find_path(Oculus_INCLUDE_DIR
     OVR.h
-    HINTS "$ENV{HOME}/OculusSDK/LibOVR/Include"
+    HINTS "OculusSDK/LibOVR/Include"
+          "$ENV{HOME}/OculusSDK/LibOVR/Include"
     )
+
+set(PATH_TO_LIB
+    "OculusSDK/LibOVR/Lib/Windows/Win32/Release/VS${VISUAL_STUDIO_YEAR}"
+    )
+
+message("${PATH_TO_LIB}")
 
 find_library(Oculus_LIBRARY
     LibOVR
-    HINTS "$ENV{HOME}/OculusSDK/LibOVR/Lib/Windows/Win32/Release/VS2015"
+    HINTS "${PATH_TO_LIB}"
+          "$ENV{HOME}/${PATH_TO_LIB}"
     )
 
 set(Oculus_LIBRARIES "${Oculus_LIBRARY}")

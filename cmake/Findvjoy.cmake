@@ -1,11 +1,13 @@
 find_path(vjoy_INCLUDE_DIR
     public.h
-    HINTS "$ENV{HOME}/vjoy/inc"
+#    HINTS "$ENV{HOME}/vjoy/inc"
+    HINTS "vjoy/inc"
     )
 
 find_library(vjoy_LIBRARY
     vJoyInterface
-    HINTS "$ENV{HOME}/vjoy/lib"
+#    HINTS "$ENV{HOME}/vjoy/lib"
+    HINTS "vjoy/lib"
     )
 
 set(vjoy_LIBRARIES "${vjoy_LIBRARY}")
