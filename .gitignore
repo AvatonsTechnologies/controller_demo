@@ -2,6 +2,7 @@ build/
 vjoy/
 tactonic/
 OculusSDK/
+boost*/
 *.o
 *.a
 *.exe

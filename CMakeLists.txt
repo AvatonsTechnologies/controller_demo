@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 project(controller_demo)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Thanks to Oculus and Tactonics, it is only possible to build 32-bit and with
-# Visual Studio (I think). Windows only, obviously.
+# Thanks to Oculus and Tactonic, it is only possible to build 32-bit and (I
+# think) only with Visual Studio. Windows only, obviously.
 if (NOT "${CMAKE_GENERATOR}" MATCHES
         "^Visual Studio [1-9][1-9] 20[1-9][1-9]$")
     message(FATAL_ERROR "Can only compile with Visual Studio in 32-bit mode.")
@@ -20,7 +20,7 @@ add_subdirectory(src)
 add_executable(demo ${DEMO_SOURCES} ${DEMO_HEADERS})
 add_executable(visualizer ${VISUALIZER_SOURCES} ${VISUALIZER_HEADERS})
 
-# Find and include external libraries
+# Include libraries with custom search modules
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -43,6 +43,18 @@ if (Oculus_FOUND)
     include_directories(demo ${Oculus_INCLUDE_DIRS})
     target_link_libraries(demo ${Oculus_LIBRARIES})
 endif ()
+
+# Include Boost
+
+set(Boost_USE_STATIC_LIBS OFF) 
+set(Boost_USE_MULTITHREADED ON)  
+set(Boost_USE_STATIC_RUNTIME OFF) 
+find_package(Boost 1.45.0 COMPONENTS program_options) 
+
+if(Boost_FOUND)
+    include_directories(demo ${Boost_INCLUDE_DIRS}) 
+    target_link_libraries(demo ${Boost_LIBRARIES})
+endif()
 
 # Configure CxxTest
 
