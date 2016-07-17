@@ -1,14 +1,22 @@
 #pragma once
 
-extern "C" {
+#include <stdexcept>
+#include <string>
 
-const size_t MAX_DEVICES = 8;
+#include <Tactonic.h>
 
-struct device_s;
-typedef struct device_s device_t;
+class DeviceError : public std::runtime_error {
+public:
+    explicit DeviceError(const std::string& what_arg) :
+        std::runtime_error(what_arg) {}
+    explicit DeviceError(const char* what_arg) :
+        std::runtime_error(what_arg) {}
+};
+
+class Device;
 
 typedef struct frame_s {
-    const device_t* device;
+    const Device* device;
     double time;
     int* forces;
     int num_forces;
@@ -16,14 +24,28 @@ typedef struct frame_s {
     int cols;
 } frame_t;
 
-device_t* create_device();
-void destroy_device(device_t* device);
+const size_t MAX_DEVICES = 8;
 
-void init_device_array(device_t* device);
+class Device {
+public:
+    Device();
+    ~Device();
+    int get_rows() const;
+    int get_cols() const;
+    frame_t get_current_frame() const;
+    bool poll();
+private:
+    int rows;
+    int cols;
 
-int device_rows(const device_t* device);
-int device_cols(const device_t* device);
-char poll_frame(device_t* device);
-void get_current_frame(const device_t* device, frame_t* frame);
+    int num_devices;
+    TactonicDeviceList* device_list;
+    TactonicDevice composite_device;
+    TactonicDevice devices[MAX_DEVICES];
 
-}
+    TactonicFrame* composite_frame;
+    TactonicFrame* frames[MAX_DEVICES];
+
+    bool updated[MAX_DEVICES];
+};
+

@@ -1,11 +1,17 @@
-// Code to acquire and control a virtual joystick
+// Structures to acquire and feed a virtual joystick
 
 #pragma once
 
-extern "C" {
+#include <stdexcept>
+#include <string>
 
-struct stick_s;
-typedef struct stick_s stick_t;
+class JoystickError : public std::runtime_error {
+public:
+    explicit JoystickError(const std::string& what_arg) :
+        std::runtime_error(what_arg) {}
+    explicit JoystickError(const char* what_arg) :
+        std::runtime_error(what_arg) {}
+};
 
 typedef struct stick_stat_s {
     // Axis values range from -1 to 1
@@ -13,12 +19,29 @@ typedef struct stick_stat_s {
     float axis_y;
 } stick_stat_t;
 
-// Attempts to take control of the first available vJoy device.
-stick_t* acquire_stick();
+// Interface for concrete joystick backends
+class Joystick {
+public:
+    virtual ~Joystick() {};
+    virtual void set_state(const stick_stat_t& stat) = 0;
+};
 
-void destroy_stick(stick_t* stick);
+// Joystick powered by regular old vJoy
+class VJoyJoystick : public Joystick {
+public:
+    VJoyJoystick();
+    ~VJoyJoystick();
+    void set_state(const stick_stat_t& state);
+private:
+    unsigned int device_id;
+};
 
-//void read_stick(const stick_t* stick, stick_stat_t* stat);
-void write_stick(stick_t* stick, const stick_stat_t* stat);
-
-}
+// Joystick powered by modified ScpVBus/vJoy/vXbox
+class VXboxJoystick : public Joystick {
+public:
+    VXboxJoystick();
+    ~VXboxJoystick();
+    void set_state(const stick_stat_t& state);
+private:
+    unsigned int device_id;
+};

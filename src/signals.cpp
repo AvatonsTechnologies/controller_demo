@@ -1,71 +1,33 @@
 #include "signals.h"
 
-extern "C" {
+CyclicBuf::CyclicBuf() : data(), head(0) {}
 
-const cyclic_buf_t EMPTY_BUF = {
-    {},
-    0
-};
-
-const cyclic_buf2_t EMPTY_BUF2 = {
-    {},
-    0
-};
-
-float cyclic_index(cyclic_buf_t* buf, int i) {
-    return buf->data[(buf->head + i) % SIGNAL_LENGTH];
+float CyclicBuf::operator[](size_t i) const {
+    return this->data[(this->head + i) % SIGNAL_LENGTH];
 }
 
-float* cyclic_index2(cyclic_buf2_t* buf, int i) {
-    return buf->data[(buf->head + i) % SIGNAL_LENGTH];
+float& CyclicBuf::operator[](size_t i) {
+    return this->data[(this->head + i) % SIGNAL_LENGTH];
 }
 
-void cyclic_insert(cyclic_buf_t* buf, float e) {
-    if (buf->head == 0) {
-        buf->head = SIGNAL_LENGTH - 1;
+float CyclicBuf::get_head() const {
+    return this->data[this->head];
+}
+
+void CyclicBuf::insert(float e) {
+    if (this->head == 0) {
+        this->head = SIGNAL_LENGTH - 1;
     } else {
-        buf->head--;
+        this->head--;
     }
-    buf->data[buf->head] = e;
+    this->data[this->head] = e;
 }
 
-void cyclic_insert2(cyclic_buf2_t* buf, float* e) {
-    if (buf->head == 0) {
-        buf->head = SIGNAL_LENGTH - 1;
-    } else {
-        buf->head--;
-    }
-    buf->data[buf->head][0] = e[0];
-    buf->data[buf->head][1] = e[1];
-}
-
-void convolve_with(cyclic_buf_t* signal,
-                   int start,
-                   int end,
-                   const float* kernel,
-                   int kernel_size,
-                   cyclic_buf_t* out) {
-    int i;
-    for (i = end - 1; i >= start; i--) {
-        int j;
-        float val = 0;
-        for (j = 0; j < kernel_size; j++) {
-            val += kernel[j] * cyclic_index(signal, i + j);           
-        }
-        cyclic_insert(out, val);
-    }
-}
-
-float convolve_point(cyclic_buf_t* signal,
-                     int i,
-                     const float* kernel,
-                     int kernel_size) {
+float CyclicBuf::convolve_point(const float* kernel, size_t kernel_size, size_t
+        start) const {
     float val = 0;
-    int j;
-    for (j = 0; j < kernel_size; j++) {
-        val += kernel[j] * cyclic_index(signal, i + j);           
+    for (size_t j = 0; j < kernel_size; j++) {
+        val += kernel[j] * (*this)[start + j];
     }
     return val;
-}
-
 }

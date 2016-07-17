@@ -1,7 +1,3 @@
-// TODO: Several objects are not freed if the program exits early (which it
-// often does)
-// TODO: Subroutines should not terminate the program.
-
 #pragma once
 
 #include <math.h>
@@ -15,15 +11,13 @@
 #include "device.h"
 #include "stick.h"
 
-extern "C" {
-
 const float RAD_TO_DEG = 180.0f / (2.0f * 3.14159265358979323f);
 
 int main() {
-    device_t* device = create_device();
-    init_device_array(device);
-    controller_info_t* controller = create_controller(device);
-    stick_t* stick = acquire_stick();
+    VXboxJoystick stick;
+    Device device;
+    Controller controller(device);
+
     ovrSession session;
     ovrGraphicsLuid luid;
     {
@@ -45,7 +39,7 @@ int main() {
     float radius = 0.0f;
     float direction[2] = { 0.0f, 0.0f };
     float yaw = 0.0f;
-    while (1) {
+    while (true) {
 
         ovrTrackingState ts = ovr_GetTrackingState(
             session, ovr_GetTimeInSeconds(), 0);
@@ -59,13 +53,11 @@ int main() {
             s = sinf(yaw);
         }
 
-        if (poll_frame(device)) {
-            frame_t frame;
-            get_current_frame(device, &frame);
-            new_coordinates(controller, &frame, &radius, direction);
-            print_debug(controller);
-            printf("Rift.yaw: %f\xb0\n", yaw * RAD_TO_DEG);
-            fflush(stdout);
+        if (device.poll()) {
+            frame_t frame = device.get_current_frame();
+            controller.add_frame(frame);
+            radius = controller.get_current_radius();
+            controller.get_current_direction(direction);
         }
 
         stick_stat_t stat = {
@@ -73,15 +65,10 @@ int main() {
             radius * (s * direction[0] + c * direction[1])
         };
 
-        write_stick(stick, &stat);
+        stick.set_state(stat);
     }
 
     ovr_Destroy(session);
     ovr_Shutdown();
-    destroy_stick(stick);
-    destroy_controller(controller);
-    destroy_device(device);
     return 0;
-}
-
 }

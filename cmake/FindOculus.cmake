@@ -8,8 +8,6 @@ set(PATH_TO_LIB
     "OculusSDK/LibOVR/Lib/Windows/Win32/Release/VS${VISUAL_STUDIO_YEAR}"
     )
 
-message("${PATH_TO_LIB}")
-
 find_library(Oculus_LIBRARY
     LibOVR
     HINTS "${PATH_TO_LIB}"

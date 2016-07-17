@@ -2,38 +2,20 @@
 
 // TODO: Use rational arithmetic
 
-extern "C" {
+const size_t SIGNAL_LENGTH = 20;
 
-const int SIGNAL_LENGTH = 20;
+class CyclicBuf {
+public:
+    CyclicBuf();
 
-typedef struct cyclic_buf_s {
+    float operator[](size_t i) const;
+    float& operator[](size_t i);
+
+    float get_head() const;
+    void insert(float e);
+    float convolve_point(const float* kernel, size_t kernel_size, size_t start)
+        const;
+private:
     float data[SIGNAL_LENGTH];
     size_t head;
-} cyclic_buf_t;
-
-typedef struct cyclic_buf2_s {
-    float data[SIGNAL_LENGTH][2];
-    size_t head;
-} cyclic_buf2_t;
-
-extern const cyclic_buf_t EMPTY_BUF;
-extern const cyclic_buf2_t EMPTY_BUF2;
-
-float cyclic_index(cyclic_buf_t* buf, int i);
-float* cyclic_index2(cyclic_buf2_t* buf, int i);
-void cyclic_insert(cyclic_buf_t* buf, float e);
-void cyclic_insert2(cyclic_buf2_t* buf, float* e);
-
-void convolve_with(cyclic_buf_t* signal,
-                   int start,
-                   int end,
-                   const float* kernel,
-                   int kernel_size,
-                   cyclic_buf_t* out);
-
-float convolve_point(cyclic_buf_t* signal,
-                     int start,
-                     const float* kernel,
-                     int kernel_size);
-
-}
+};
